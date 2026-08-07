@@ -1,29 +1,45 @@
 import { NextResponse } from 'next/server';
 import { mockMonitors } from '@/lib/mock-data';
+import { validateBody, MonitorSchema } from '@/lib/validation';
+import { rateLimit } from '@/lib/rate-limit';
+
+const monitors = [...mockMonitors];
 
 export async function GET() {
-  return NextResponse.json(mockMonitors);
+  return NextResponse.json(monitors);
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+  const rl = rateLimit(`monitors:${ip}`, 20, 60_000);
+  if (!rl.ok) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
+
+  const validation = validateBody(MonitorSchema, body);
+  if (!validation.ok) {
+    return NextResponse.json({ error: validation.error }, { status: 400 });
+  }
+
   const newMonitor = {
     id: `mon_${Date.now()}`,
-    projectId: body.projectId || 'proj_1',
-    name: body.name,
-    url: body.url,
-    type: body.type || 'https',
-    interval: body.interval || 60,
-    timeout: body.timeout || 10,
-    retries: body.retries || 3,
+    projectId: 'proj_1',
+    ...validation.data,
     status: 'pending' as const,
     lastCheck: null,
     lastStatusCode: null,
     lastLatency: null,
     uptime: 100,
-    tags: body.tags || [],
     createdAt: new Date(),
     updatedAt: new Date(),
   };
+  monitors.push(newMonitor);
   return NextResponse.json(newMonitor, { status: 201 });
 }

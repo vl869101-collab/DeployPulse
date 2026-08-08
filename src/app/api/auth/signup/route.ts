@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { validateBody, SignupSchema } from '@/lib/validation';
 import { rateLimit } from '@/lib/rate-limit';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-  const rl = rateLimit(`signup:${ip}`, 5, 60_000); // 5 attempts per minute
+  const rl = rateLimit(`signup:${ip}`, 5, 60_000);
   if (!rl.ok) {
     return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 });
   }
@@ -21,15 +23,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: validation.error }, { status: 400 });
   }
 
-  return NextResponse.json({
-    user: {
-      id: `user_${Date.now()}`,
+  const existing = await prisma.user.findUnique({
+    where: { email: validation.data.email },
+  });
+
+  if (existing) {
+    return NextResponse.json({ error: 'Email already in use' }, { status: 409 });
+  }
+
+  const hashed = await bcrypt.hash(validation.data.password, 12);
+
+  const user = await prisma.user.create({
+    data: {
       name: validation.data.name,
       email: validation.data.email,
-      avatar: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      password: hashed,
     },
-    token: 'mock_jwt_token_' + Date.now(),
+  });
+
+  return NextResponse.json({
+    user: { id: user.id, name: user.name, email: user.email },
   }, { status: 201 });
 }

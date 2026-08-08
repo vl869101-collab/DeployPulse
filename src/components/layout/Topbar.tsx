@@ -3,9 +3,9 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { Command, CommandInput, CommandList, CommandItem, CommandGroup, CommandSeparator, CommandDialog } from '@/components/ui/command';
@@ -13,16 +13,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, Bell, Shield, Settings, User, LogOut, Plus, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-const user = {
-  name: 'Demo User',
-  email: 'demo@deploypulse.com',
-  avatar: null,
-};
-
 const recentProjects = [
-  { name: 'Production API', href: '/?project=proj_1', icon: Zap },
-  { name: 'Marketing Website', href: '/?project=proj_2', icon: Shield },
-  { name: 'Internal Tools', href: '/?project=proj_3', icon: Settings },
+  { name: 'Production API', href: '/monitors', icon: Zap },
+  { name: 'Marketing Website', href: '/status', icon: Shield },
+  { name: 'Internal Tools', href: '/settings', icon: Settings },
 ];
 
 const notifications = [
@@ -33,6 +27,7 @@ const notifications = [
 ];
 
 export function Topbar() {
+  const { data: session } = useSession();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [searchOpen, setSearchOpen] = React.useState(false);
@@ -40,6 +35,7 @@ export function Topbar() {
   const [userMenuOpen, setUserMenuOpen] = React.useState(false);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const user = session?.user;
 
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -163,16 +159,16 @@ export function Topbar() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src={user.avatar || undefined} alt={user.name} />
-                  <AvatarFallback>{user.name?.charAt(0) || 'U'}</AvatarFallback>
+                  <AvatarImage src={user?.image || undefined} alt={user?.name || 'User'} />
+                  <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user.name}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                  <p className="text-sm font-medium leading-none">{user?.name || 'User'}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user?.email || ''}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -189,7 +185,7 @@ export function Topbar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => setUserMenuOpen(false)}>
+              <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => signOut({ callbackUrl: '/login' })}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </DropdownMenuItem>

@@ -1,0 +1,12 @@
+--- Paste these 3 env vars in Vercel ---
+
+DATABASE_URL
+postgresql://postgres:VictorLima2012@db.wljgmmxpawumcunqirfl.supabase.co:5432/postgres
+
+NEXTAUTH_SECRET
+deploypulse-prod-secret-2026-victor
+
+NEXTAUTH_URL
+https://deploypulse-h5ntj9o0k-victor-limas-projects.vercel.app
+
+--- Select All → Copy ---

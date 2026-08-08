@@ -11,7 +11,7 @@ import { CreditCard, Download, Check, Zap, Shield, Crown, ExternalLink } from 'l
 const plans = [
   {
     name: 'Starter',
-    price: '$19',
+    price: '$9',
     period: '/mo',
     monitors: 10,
     checks: '10k',
@@ -20,7 +20,7 @@ const plans = [
   },
   {
     name: 'Pro',
-    price: '$49',
+    price: '$29',
     period: '/mo',
     monitors: 50,
     checks: '100k',
@@ -29,7 +29,7 @@ const plans = [
   },
   {
     name: 'Business',
-    price: '$149',
+    price: '$79',
     period: '/mo',
     monitors: 200,
     checks: '500k',
@@ -39,10 +39,10 @@ const plans = [
 ];
 
 const invoices = [
-  { id: 'INV-2024-03', date: 'Mar 1, 2024', amount: '$49.00', status: 'paid' },
-  { id: 'INV-2024-02', date: 'Feb 1, 2024', amount: '$49.00', status: 'paid' },
-  { id: 'INV-2024-01', date: 'Jan 1, 2024', amount: '$49.00', status: 'paid' },
-  { id: 'INV-2023-12', date: 'Dec 1, 2023', amount: '$19.00', status: 'paid' },
+  { id: 'INV-2024-03', date: 'Mar 1, 2024', amount: '$29.00', status: 'paid' },
+  { id: 'INV-2024-02', date: 'Feb 1, 2024', amount: '$29.00', status: 'paid' },
+  { id: 'INV-2024-01', date: 'Jan 1, 2024', amount: '$29.00', status: 'paid' },
+  { id: 'INV-2023-12', date: 'Dec 1, 2023', amount: '$9.00', status: 'paid' },
 ];
 
 export default function BillingPage() {

@@ -33,5 +33,7 @@ export const StatusPageSchema = z.object({
 export function validateBody<T>(schema: z.ZodSchema<T>, body: unknown): { ok: true; data: T } | { ok: false; error: string } {
   const result = schema.safeParse(body);
   if (result.success) return { ok: true, data: result.data };
-  return { ok: false, error: result.error.issues.map((i) => i.message).join(', ') };
+  // ponytail: generic error — log details server-side only
+  console.error('[validation]', result.error.issues);
+  return { ok: false, error: 'Invalid request' };
 }

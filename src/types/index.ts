@@ -198,3 +198,42 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+
+export type DeploymentStatus = 'ready' | 'building' | 'queued' | 'canceled' | 'errored';
+export type DeploymentEnvironment = 'production' | 'preview' | 'development';
+
+export interface Deployment {
+  id: string;
+  projectId: string;
+  name: string;
+  commitMessage: string;
+  commitHash: string;
+  branch: string;
+  author: string;
+  authorEmail: string;
+  status: DeploymentStatus;
+  environment: DeploymentEnvironment;
+  url: string;
+  createdAt: Date;
+  readyAt: Date | null;
+  duration: number | null;
+  buildLogs: string[];
+  error?: string;
+}
+
+export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+
+export interface LogEntry {
+  id: string;
+  timestamp: Date;
+  level: LogLevel;
+  statusCode: number;
+  method: string;
+  host: string;
+  path: string;
+  message: string;
+  latency: number | null;
+  region: string;
+  userAgent: string;
+  ip: string;
+}

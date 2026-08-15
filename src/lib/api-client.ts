@@ -1,13 +1,27 @@
-import { Alert, Check, Incident, Monitor, StatusPage } from '@/types';
+import {
+  Alert,
+  Check,
+  Deployment,
+  DeploymentEnvironment,
+  DeploymentStatus,
+  Incident,
+  LogEntry,
+  LogLevel,
+  Monitor,
+  StatusPage,
+} from '@/types';
 import {
   generateMockChecks,
   mockAlerts,
+  mockDeployments,
   mockIncidents,
+  mockLogEntries,
   mockMonitors,
   mockStatusPages,
 } from '@/lib/mock-data';
 
 export type MonitorDetails = Monitor & { checks?: Check[] };
+export type { Deployment, DeploymentEnvironment, DeploymentStatus, LogEntry, LogLevel };
 
 function toDate(value: Date | string | null): Date | null {
   return value instanceof Date ? value : value ? new Date(value) : null;
@@ -130,4 +144,26 @@ export async function updateStatusPage(id: string, data: Partial<StatusPage>): P
 
 export async function deleteStatusPage(id: string): Promise<void> {
   await fetch(`/api/status-pages/${id}`, { method: 'DELETE' });
+}
+
+export function normalizeDeployment(deployment: Deployment): Deployment {
+  return {
+    ...deployment,
+    createdAt: toDate(deployment.createdAt)!,
+    readyAt: toDate(deployment.readyAt),
+  };
+}
+
+function normalizeLogEntry(entry: LogEntry): LogEntry {
+  return { ...entry, timestamp: toDate(entry.timestamp)! };
+}
+
+export async function fetchDeployments(): Promise<Deployment[]> {
+  const deployments = await request<Deployment[]>('/api/deployments', mockDeployments);
+  return deployments.map(normalizeDeployment);
+}
+
+export async function fetchLogs(): Promise<LogEntry[]> {
+  const entries = await request<LogEntry[]>('/api/logs', mockLogEntries);
+  return entries.map(normalizeLogEntry);
 }

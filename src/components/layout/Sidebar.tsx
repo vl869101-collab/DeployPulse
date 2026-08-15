@@ -27,6 +27,8 @@ import {
   Home,
   Activity,
   BarChart2,
+  Rocket,
+  FileText,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -40,6 +42,8 @@ const navigation = [
   { name: 'Alerts', href: '/alerts', icon: Bell },
   { name: 'Status Pages', href: '/status', icon: Globe },
   { name: 'Analytics', href: '/analytics', icon: BarChart2 },
+  { name: 'Deployments', href: '/deployments', icon: Rocket },
+  { name: 'Logs', href: '/logs', icon: FileText },
 ];
 
 const settingsNavigation = [

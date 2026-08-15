@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
-import { mockMonitors } from '@/lib/mock-data';
+import { monitors } from '@/lib/store';
 import { validateBody, MonitorSchema } from '@/lib/validation';
 import { rateLimit } from '@/lib/rate-limit';
-
-const monitors = [...mockMonitors];
 
 export async function GET() {
   return NextResponse.json(monitors);

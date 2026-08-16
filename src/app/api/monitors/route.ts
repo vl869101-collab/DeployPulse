@@ -1,13 +1,25 @@
 import { NextResponse } from 'next/server';
-import { monitors } from '@/lib/store';
+import { auth } from '@/auth';
+import { prisma } from '@/lib/prisma';
+import { toMonitor } from '@/lib/monitor-mappers';
 import { validateBody, MonitorSchema } from '@/lib/validation';
 import { rateLimit } from '@/lib/rate-limit';
 
 export async function GET() {
-  return NextResponse.json(monitors);
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const monitors = await prisma.monitor.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: 'desc' },
+  });
+  return NextResponse.json(monitors.map(toMonitor));
 }
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
   const rl = rateLimit(`monitors:${ip}`, 20, 60_000);
   if (!rl.ok) {
@@ -26,18 +38,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: validation.error }, { status: 400 });
   }
 
-  const newMonitor = {
-    id: `mon_${Date.now()}`,
-    projectId: 'proj_1',
-    ...validation.data,
-    status: 'pending' as const,
-    lastCheck: null,
-    lastStatusCode: null,
-    lastLatency: null,
-    uptime: 100,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-  monitors.push(newMonitor);
-  return NextResponse.json(newMonitor, { status: 201 });
+  const monitor = await prisma.monitor.create({
+    data: {
+      ...validation.data,
+      userId: session.user.id,
+      status: 'pending',
+    },
+  });
+  return NextResponse.json(toMonitor(monitor), { status: 201 });
 }

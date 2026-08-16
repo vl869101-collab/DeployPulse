@@ -11,12 +11,10 @@ import {
   StatusPage,
 } from '@/types';
 import {
-  generateMockChecks,
   mockAlerts,
   mockDeployments,
   mockIncidents,
   mockLogEntries,
-  mockMonitors,
   mockStatusPages,
 } from '@/lib/mock-data';
 
@@ -71,15 +69,14 @@ async function request<T>(path: string, fallback: T): Promise<T> {
 }
 
 export async function fetchMonitors(): Promise<Monitor[]> {
-  const monitors = await request<Monitor[]>('/api/monitors', mockMonitors);
+  const monitors = await request<Monitor[]>('/api/monitors', []);
   return monitors.map(normalizeMonitor);
 }
 
 export async function fetchMonitor(id: string): Promise<MonitorDetails | null> {
-  const fallback = mockMonitors.find((monitor) => monitor.id === id);
   const monitor = await request<MonitorDetails | null>(
     `/api/monitors/${id}`,
-    fallback ? { ...fallback, checks: generateMockChecks(id, 30) } : null
+    null
   );
   return monitor ? normalizeMonitor(monitor) : null;
 }

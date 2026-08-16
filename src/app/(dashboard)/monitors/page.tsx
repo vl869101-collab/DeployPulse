@@ -7,7 +7,7 @@ import { Plus } from 'lucide-react';
 import { MonitorTable } from '@/components/dashboard/MonitorTable';
 import { FilterBar } from '@/components/dashboard/FilterBar';
 import { MonitorDialog } from '@/components/monitors/MonitorDialog';
-import { fetchMonitors, createMonitor, updateMonitor, deleteMonitor } from '@/lib/api-client';
+import { getLocalMonitors, addLocalMonitor, updateLocalMonitor, deleteLocalMonitor } from '@/lib/monitor-store';
 import { Monitor } from '@/types';
 
 export default function MonitorsPage() {
@@ -17,7 +17,7 @@ export default function MonitorsPage() {
   const [filters, setFilters] = React.useState<Record<string, string>>({});
 
   const loadMonitors = React.useCallback(() => {
-    fetchMonitors().then(setMonitors);
+    setMonitors(getLocalMonitors());
   }, []);
 
   React.useEffect(() => { loadMonitors(); }, [loadMonitors]);
@@ -33,9 +33,9 @@ export default function MonitorsPage() {
 
   const handleSave = async (data: Partial<Monitor>) => {
     if (editingMonitor) {
-      await updateMonitor(editingMonitor.id, data);
+      updateLocalMonitor(editingMonitor.id, data);
     } else {
-      await createMonitor(data);
+      addLocalMonitor(data);
     }
     loadMonitors();
   };
@@ -48,16 +48,16 @@ export default function MonitorsPage() {
         break;
       case 'delete':
         if (confirm(`Delete "${monitor.name}"?`)) {
-          await deleteMonitor(monitor.id);
+          deleteLocalMonitor(monitor.id);
           loadMonitors();
         }
         break;
       case 'pause':
-        await updateMonitor(monitor.id, { status: 'disabled' });
+        updateLocalMonitor(monitor.id, { status: 'disabled' });
         loadMonitors();
         break;
       case 'resume':
-        await updateMonitor(monitor.id, { status: 'pending' });
+        updateLocalMonitor(monitor.id, { status: 'pending' });
         loadMonitors();
         break;
     }

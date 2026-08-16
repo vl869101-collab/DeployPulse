@@ -9,7 +9,8 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import { MonitorTable } from '@/components/dashboard/MonitorTable';
 import { ChartCard } from '@/components/dashboard/ChartCard';
 import { AlertFeed } from '@/components/dashboard/AlertFeed';
-import { fetchAlerts, fetchMonitors } from '@/lib/api-client';
+import { fetchAlerts } from '@/lib/api-client';
+import { getLocalMonitors } from '@/lib/monitor-store';
 import { Alert, Monitor } from '@/types';
 
 export default function DashboardPage() {
@@ -17,17 +18,8 @@ export default function DashboardPage() {
   const [alerts, setAlerts] = React.useState<Alert[]>([]);
 
   React.useEffect(() => {
-    let active = true;
-
-    Promise.all([fetchMonitors(), fetchAlerts()]).then(([nextMonitors, nextAlerts]) => {
-      if (!active) return;
-      setMonitors(nextMonitors);
-      setAlerts(nextAlerts);
-    });
-
-    return () => {
-      active = false;
-    };
+    setMonitors(getLocalMonitors());
+    fetchAlerts().then(setAlerts);
   }, []);
 
   return (
@@ -53,7 +45,7 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Monitors"
-          value="24"
+          value={String(monitors.length)}
           trend={{ value: 2, label: 'this month' }}
           icon={<Activity className="h-5 w-5 text-primary" />}
         />

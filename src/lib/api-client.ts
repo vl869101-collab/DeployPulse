@@ -91,28 +91,6 @@ export async function fetchAlerts(): Promise<Alert[]> {
   return alerts.map(normalizeAlert);
 }
 
-export async function createMonitor(data: Partial<Monitor>): Promise<Monitor> {
-  const res = await fetch('/api/monitors', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return normalizeMonitor(await res.json());
-}
-
-export async function updateMonitor(id: string, data: Partial<Monitor>): Promise<Monitor> {
-  const res = await fetch(`/api/monitors/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return normalizeMonitor(await res.json());
-}
-
-export async function deleteMonitor(id: string): Promise<void> {
-  await fetch(`/api/monitors/${id}`, { method: 'DELETE' });
-}
-
 export async function fetchStatusPages(): Promise<StatusPage[]> {
   return request<StatusPage[]>('/api/status-pages', mockStatusPages);
 }

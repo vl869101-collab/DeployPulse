@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import { useParams } from 'next/navigation';
-import { fetchMonitor, MonitorDetails } from '@/lib/api-client';
+import { MonitorDetails } from '@/lib/api-client';
+import { getLocalMonitors } from '@/lib/monitor-store';
 import { LatencyChart } from '@/components/monitors/LatencyChart';
 import { CheckHistory } from '@/components/monitors/CheckHistory';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,15 +18,9 @@ export default function MonitorDetailPage() {
   const [monitor, setMonitor] = React.useState<MonitorDetails | null>(null);
 
   React.useEffect(() => {
-    let active = true;
-
-    fetchMonitor(id).then((nextMonitor) => {
-      if (active) setMonitor(nextMonitor);
-    });
-
-    return () => {
-      active = false;
-    };
+    const monitors = getLocalMonitors();
+    const found = monitors.find((m) => m.id === id);
+    setMonitor(found ? { ...found, checks: [] } : null);
   }, [id]);
 
   if (!monitor) {

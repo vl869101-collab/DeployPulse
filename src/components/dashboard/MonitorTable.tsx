@@ -30,6 +30,7 @@ import {
 import {
   Checkbox,
 } from '@/components/ui/checkbox';
+import Link from 'next/link';
 import {
   Search,
   ChevronUp,
@@ -284,7 +285,9 @@ export function MonitorTable({ monitors, onMonitorAction, className }: MonitorTa
                         {typeLabels[monitor.type]}
                       </span>
                       <div>
-                        <p className="truncate max-w-xs">{monitor.name}</p>
+                        <Link href={`/monitors/${monitor.id}`} className="hover:underline hover:text-primary transition-colors">
+                          <p className="truncate max-w-xs">{monitor.name}</p>
+                        </Link>
                         <p className="text-xs text-muted-foreground truncate max-w-xs">{truncate(monitor.url, 50)}</p>
                       </div>
                     </div>

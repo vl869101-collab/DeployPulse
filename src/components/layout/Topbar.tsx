@@ -10,8 +10,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { Command, CommandInput, CommandList, CommandItem, CommandGroup, CommandSeparator, CommandDialog } from '@/components/ui/command';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Bell, Shield, Settings, User, LogOut, Plus, Zap } from 'lucide-react';
+import { Search, Bell, Shield, Settings, User, LogOut, Plus, Zap, Rocket, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { deployments } from '@/lib/deploy-data';
 
 const recentProjects = [
   { name: 'Production API', href: '/monitors', icon: Zap },
@@ -86,6 +87,22 @@ export function Topbar() {
         </div>
 
         <div className="flex items-center gap-2 lg:gap-4">
+          <Link
+            href="/deployments"
+            className="hidden items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium sm:flex hover:bg-accent"
+            title={deployments[0]?.message}
+          >
+            <Rocket className="h-3.5 w-3.5 text-muted-foreground" />
+            <span>Last deploy</span>
+            {deployments[0]?.warnings > 0 ? (
+              <AlertTriangle className="h-3.5 w-3.5 text-amber-400" />
+            ) : (
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+            )}
+            <Badge variant="secondary" className="px-1.5 text-[10px]">
+              {deployments[0]?.status ?? 'success'}
+            </Badge>
+          </Link>
           <DropdownMenu open={notificationsOpen} onOpenChange={setNotificationsOpen}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">

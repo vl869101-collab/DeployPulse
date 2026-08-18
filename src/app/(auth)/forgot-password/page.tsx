@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
             {step === 'email' ? (
               <>
                 <CardTitle className="text-2xl">Forgot password?</CardTitle>
-                <CardDescription>Enter your email and we'll send you a reset link</CardDescription>
+                <CardDescription>Enter your email and we&apos;ll send you a reset link</CardDescription>
               </>
             ) : (
               <>
@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
                 </div>
                 <CardTitle className="text-2xl">Check your email</CardTitle>
                 <CardDescription>
-                  We've sent a password reset link to <strong>{email}</strong>
+                  We&apos;ve sent a password reset link to <strong>{email}</strong>
                 </CardDescription>
               </>
             )}
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
             ) : (
               <div className="space-y-4">
                 <Button variant="outline" className="w-full" onClick={() => setStep('email')}>
-                  Didn't receive it? Resend
+                  Didn&apos;t receive it? Resend
                 </Button>
                 <Link href="/auth/login" className="block text-center text-sm text-primary hover:underline">
                   Back to login

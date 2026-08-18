@@ -33,6 +33,7 @@ import {
   type DeploymentStatus,
 } from '@/lib/api-client';
 import { cn, formatRelativeTime } from '@/lib/utils';
+import { DeployLog } from '@/components/deployments/DeployLog';
 
 const environmentBadge: Record<DeploymentEnvironment, { label: string; className: string }> = {
   production: {
@@ -253,6 +254,7 @@ export default function DeploymentsPage() {
           </Table>
         </CardContent>
       </Card>
+      <DeployLog />
     </div>
   );
 }

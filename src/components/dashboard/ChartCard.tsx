@@ -103,7 +103,7 @@ export function LatencyChart({ data, className }: LatencyChartProps) {
             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
           }}
           labelFormatter={(value) => new Date(Number(value)).toLocaleString()}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           formatter={(value: any) => (value !== undefined ? `${Number(value).toFixed(0)}ms` : 'N/A')}
         />
         <Line
@@ -161,7 +161,7 @@ export function UptimeChart({ data, className }: UptimeChartProps) {
             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
           }}
           labelFormatter={(value) => new Date(Number(value)).toLocaleDateString()}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           formatter={(value: any) => (value !== undefined ? `${Number(value).toFixed(2)}%` : 'N/A')}
         />
         <Area

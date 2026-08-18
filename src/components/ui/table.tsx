@@ -207,7 +207,7 @@ export function createSortableColumn<TData>(
   cell?: (info: { getValue: () => unknown }) => React.ReactNode
 ): ColumnDef<TData> {
   const helper = createColumnHelper<TData>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return helper.accessor(accessor as any, {
     header: ({ column }) => (
       <button

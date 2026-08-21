@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Activity, Mail, Lock, User, Loader2, GitBranch, FolderGit2, Globe } from 'lucide-react';
 
 export default function SignupPage() {
+  const router = useRouter();
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -33,7 +35,7 @@ export default function SignupPage() {
     setError('');
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setLoading(false);
-    window.location.href = '/';
+    router.push('/');
   };
 
   return (

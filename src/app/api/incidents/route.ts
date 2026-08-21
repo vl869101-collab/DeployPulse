@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/auth';
 import { mockIncidents } from '@/lib/mock-data';
 import { z } from 'zod';
 import { validateBody } from '@/lib/validation';
@@ -13,10 +14,16 @@ const CreateIncidentSchema = z.object({
 });
 
 export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   return NextResponse.json(mockIncidents);
 }
 
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
   const rl = rateLimit(`incidents:${ip}`, 10, 60_000);
   if (!rl.ok) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });

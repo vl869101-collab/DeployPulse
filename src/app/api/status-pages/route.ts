@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/auth';
 import { mockStatusPages } from '@/lib/mock-data';
 import { validateBody, StatusPageSchema } from '@/lib/validation';
 import { rateLimit } from '@/lib/rate-limit';
@@ -6,10 +7,16 @@ import { rateLimit } from '@/lib/rate-limit';
 const pages = [...mockStatusPages];
 
 export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   return NextResponse.json(pages);
 }
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
   const rl = rateLimit(`status-pages:${ip}`, 10, 60_000);
   if (!rl.ok) {

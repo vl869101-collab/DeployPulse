@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { prisma } from '@/lib/prisma';
-import { toMonitor } from '@/lib/monitor-mappers';
 import { generateMockChecks } from '@/lib/mock-data';
 import { validateBody, MonitorSchema } from '@/lib/validation';
 import { rateLimit } from '@/lib/rate-limit';
+import { getMonitor, updateMonitor, deleteMonitor } from '@/lib/monitor-repository';
 
 export async function GET(
   _request: Request,
@@ -14,12 +13,12 @@ export async function GET(
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
-  const monitor = await prisma.monitor.findFirst({ where: { id, userId: session.user.id } });
+  const monitor = await getMonitor(session.user.id, id);
   if (!monitor) {
     return NextResponse.json({ error: 'Monitor not found' }, { status: 404 });
   }
   const checks = generateMockChecks(id, 50);
-  return NextResponse.json({ ...toMonitor(monitor), checks });
+  return NextResponse.json({ ...monitor, checks });
 }
 
 export async function PUT(
@@ -34,8 +33,6 @@ export async function PUT(
   if (!rl.ok) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
 
   const { id } = await params;
-  const existing = await prisma.monitor.findFirst({ where: { id, userId: session.user.id } });
-  if (!existing) return NextResponse.json({ error: 'Monitor not found' }, { status: 404 });
 
   let body: unknown;
   try {
@@ -49,8 +46,9 @@ export async function PUT(
     return NextResponse.json({ error: validation.error }, { status: 400 });
   }
 
-  const monitor = await prisma.monitor.update({ where: { id }, data: validation.data });
-  return NextResponse.json(toMonitor(monitor));
+  const monitor = await updateMonitor(session.user.id, id, validation.data);
+  if (!monitor) return NextResponse.json({ error: 'Monitor not found' }, { status: 404 });
+  return NextResponse.json(monitor);
 }
 
 export async function DELETE(
@@ -65,9 +63,7 @@ export async function DELETE(
   if (!rl.ok) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
 
   const { id } = await params;
-  const existing = await prisma.monitor.findFirst({ where: { id, userId: session.user.id } });
-  if (!existing) return NextResponse.json({ error: 'Monitor not found' }, { status: 404 });
-
-  await prisma.monitor.delete({ where: { id } });
+  const ok = await deleteMonitor(session.user.id, id);
+  if (!ok) return NextResponse.json({ error: 'Monitor not found' }, { status: 404 });
   return NextResponse.json({ success: true });
 }

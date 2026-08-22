@@ -7,7 +7,12 @@ type StoredMonitor = {
   type: string;
   interval: number;
   timeout: number;
+  retries?: number;
   status: string;
+  lastCheck?: Date | null;
+  lastStatusCode?: number | null;
+  lastLatency?: number | null;
+  uptime?: number;
   tags: string[];
   userId: string;
   createdAt: Date;
@@ -23,12 +28,12 @@ export function toMonitor(monitor: StoredMonitor): Monitor {
     type: monitor.type as Monitor['type'],
     interval: monitor.interval,
     timeout: monitor.timeout,
-    retries: 3,
+    retries: monitor.retries ?? 3,
     status: monitor.status as Monitor['status'],
-    lastCheck: null,
-    lastStatusCode: null,
-    lastLatency: null,
-    uptime: 100,
+    lastCheck: monitor.lastCheck ?? null,
+    lastStatusCode: monitor.lastStatusCode ?? null,
+    lastLatency: monitor.lastLatency ?? null,
+    uptime: monitor.uptime ?? 100,
     tags: monitor.tags,
     createdAt: monitor.createdAt,
     updatedAt: monitor.updatedAt,

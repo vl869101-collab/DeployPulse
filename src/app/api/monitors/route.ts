@@ -1,19 +1,15 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { prisma } from '@/lib/prisma';
-import { toMonitor } from '@/lib/monitor-mappers';
 import { validateBody, MonitorSchema } from '@/lib/validation';
 import { rateLimit } from '@/lib/rate-limit';
+import { getMonitors, createMonitor } from '@/lib/monitor-repository';
 
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const monitors = await prisma.monitor.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: 'desc' },
-  });
-  return NextResponse.json(monitors.map(toMonitor));
+  const monitors = await getMonitors(session.user.id);
+  return NextResponse.json(monitors);
 }
 
 export async function POST(request: Request) {
@@ -38,12 +34,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: validation.error }, { status: 400 });
   }
 
-  const monitor = await prisma.monitor.create({
-    data: {
-      ...validation.data,
-      userId: session.user.id,
-      status: 'pending',
-    },
-  });
-  return NextResponse.json(toMonitor(monitor), { status: 201 });
+  const monitor = await createMonitor(session.user.id, validation.data);
+  return NextResponse.json(monitor, { status: 201 });
 }

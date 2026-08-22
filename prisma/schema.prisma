@@ -55,19 +55,27 @@ model VerificationToken {
 }
 
 model Monitor {
-  id          String   @id @default(cuid())
-  name        String
-  url         String
-  type        String   @default("http")
-  interval    Int      @default(60)
-  timeout     Int      @default(30)
-  status      String   @default("active")
-  tags        String[]
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  incidents   Incident[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  url            String
+  type           String    @default("http")
+  interval       Int       @default(60)
+  timeout        Int       @default(30)
+  retries        Int       @default(3)
+  status         String    @default("active")
+  lastCheck      DateTime?
+  lastStatusCode Int?
+  lastLatency    Int?
+  uptime         Float     @default(100)
+  tags           String[]  @default([])
+  incidents      Incident[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([userId, status])
 }
 
 model Incident {
